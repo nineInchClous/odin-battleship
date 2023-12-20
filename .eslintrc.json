@@ -1,0 +1,35 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es2021": true,
+    "jest": true
+  },
+  "extends": ["airbnb-base", "prettier"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-console": "off",
+    "camelcase": "warn",
+    "comma-style": ["warn", "last"],
+    "no-lonely-if": "warn",
+    "semi": ["error", "always"],
+    "no-var": "warn",
+    "no-unused-vars": "warn",
+    "quotes": ["warn", "single"],
+    "require-jsdoc": [
+      "warn",
+      {
+        "require": {
+          "FunctionDeclaration": true,
+          "MethodDefinition": false,
+          "ClassDeclaration": false,
+          "ArrowFunctionExpression": false,
+          "FunctionExpression": false
+        }
+      }
+    ]
+  }
+}
