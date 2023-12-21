@@ -1,9 +1,8 @@
 /**
  * Create a ship with a given length and a position
  */
-export default function createShip(pLength, pPosition) {
+export default function createShip(pLength) {
   const length = pLength;
-  const position = pPosition;
   let hitCount = 0;
 
   /**
@@ -19,5 +18,5 @@ export default function createShip(pLength, pPosition) {
    */
   const isSunk = () => hitCount >= length;
 
-  return { length, position, hit, isSunk };
+  return { length, hit, isSunk };
 }
