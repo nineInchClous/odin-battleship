@@ -1,8 +1,8 @@
 import createShip from './ship';
 
 /**
- *
- * @returns
+ * Create a cell for the game board with an alreadyAttacked and ship property
+ * @returns A cell object for the game board
  */
 function createGameBoardCell() {
   const alreadyAttacked = false;
@@ -13,6 +13,7 @@ function createGameBoardCell() {
 
 /**
  * Create a game board of size 10x10
+ * @returns A game board object
  */
 export default function createGameBoard() {
   const size = 10;
@@ -26,6 +27,11 @@ export default function createGameBoard() {
   }
   const ships = [];
 
+  /**
+   * Returns true if the position is valid (inside the game board), otherwise false
+   * @param {Array} pPosition The position to validate (format: [x, y])
+   * @returns True if the position is valid, otherwise false
+   */
   const isPositionValid = (pPosition) => {
     if (
       pPosition[0] < 0 ||
@@ -39,6 +45,13 @@ export default function createGameBoard() {
     return true;
   };
 
+  /**
+   * Returns true if the ship is placable (inside the game board), otherwise false
+   * @param {number} pLength The length of the ship to place
+   * @param {Array} pPosition The position to validate (format: [x, y])
+   * @param {boolean} pHorizontal True if the ship is positioned horizontally, false if its positioned vertically
+   * @returns True if the position of the ship is valid, otherwise false
+   */
   const isShipPlacable = (pLength, pPosition, pHorizontal = true) => {
     if (!isPositionValid(pPosition)) return false;
 
@@ -63,6 +76,13 @@ export default function createGameBoard() {
     return true;
   };
 
+  /**
+   * Place a ship on the game board
+   * @param {number} pLength The length of the ship to place
+   * @param {Array} pPosition The position to validate (format: [x, y])
+   * @param {boolean} pHorizontal True if the ship is positioned horizontally, false if its positioned vertically
+   * @returns True if the ship has been placed, otherwise false
+   */
   const placeShip = (pLength, pPosition, pHorizontal = true) => {
     if (!isShipPlacable(pLength, pPosition, pHorizontal)) return false;
 
@@ -81,6 +101,11 @@ export default function createGameBoard() {
     return true;
   };
 
+  /**
+   * Returns true if the attack is possible (inside the game board and that position has not already been attacked), otherwise false
+   * @param {Array} pPosition The position to validate (format: [x, y])
+   * @returns True if the attack is possible, otherwise false
+   */
   const isAttackPossible = (pPosition) => {
     if (!isPositionValid(pPosition)) return false;
 
@@ -92,6 +117,11 @@ export default function createGameBoard() {
     return true;
   };
 
+  /**
+   * Attack a ship on the game board
+   * @param {Array} pPosition The position to validate (format: [x, y])
+   * @returns True if the attack position is valid, otherwise false
+   */
   const receiveAttack = (pPosition) => {
     if (!isAttackPossible(pPosition)) return false;
 
@@ -104,37 +134,71 @@ export default function createGameBoard() {
     return true;
   };
 
+  /**
+   * Returns true if all ship of the game board are sunk, otherwise false
+   * @returns True if all ship of the game board are sunk, otherwise false
+   */
   const isAllShipsSunk = () => {
     const notSunkShip = ships.find((ship) => !ship.isSunk());
     return typeof notSunkShip === 'undefined';
   };
 
   /**
-   * Get attackable positions
-   * @returns Attackable positions
+   * Get all the possible attack positions
+   * @returns An array of possible attack positions
    */
-  const getAttackablePositions = () => {
-    const attackablePositions = [];
+  const getAttackPositions = () => {
+    const attackPositions = [];
     for (let i = 0; i < board.length; i += 1) {
       for (let j = 0; j < board[i].length; j += 1) {
         if (!board[i][j].alreadyAttacked) {
-          attackablePositions.push([i, j]);
+          attackPositions.push([i, j]);
         }
       }
     }
-    return attackablePositions;
+    return attackPositions;
   };
 
+  /**
+   * Know if this position has already been attacked
+   * @param {Array} pPosition The position to validate (format: [x, y])
+   * @returns True if the position has already been attacked, otherwise false
+   * @throws {RangeError} Throws an error is the position is outside the game board
+   */
   const getCellState = (pPosition) => {
-    if (!isPositionValid(pPosition)) return false;
+    if (!isPositionValid(pPosition)) {
+      throw new RangeError('This position is outside the game board');
+    }
     return board[pPosition[0]][pPosition[1]].alreadyAttacked;
+  };
+
+  const placeShipsRandomly = () => {
+    const shipsLength = [5, 4, 3, 3, 2];
+    let horizontal;
+    let x;
+    let y;
+
+    shipsLength.forEach((shipLength) => {
+      do {
+        horizontal = Math.random() > 0.5;
+
+        if (horizontal) {
+          x = Math.floor(Math.random() * (size - shipLength + 1));
+          y = Math.floor(Math.random() * size);
+        } else {
+          x = Math.floor(Math.random() * size);
+          y = Math.floor(Math.random() * (size - shipLength + 1));
+        }
+      } while (!placeShip(shipLength, [x, y], horizontal));
+    });
   };
 
   return {
     placeShip,
     receiveAttack,
     isAllShipsSunk,
-    getAttackablePositions,
+    getAttackPositions,
     getCellState,
+    placeShipsRandomly,
   };
 }
