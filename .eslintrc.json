@@ -19,6 +19,7 @@
     "no-var": "warn",
     "no-unused-vars": "warn",
     "quotes": ["warn", "single"],
+    "import/prefer-default-export": "off",
     "require-jsdoc": [
       "warn",
       {

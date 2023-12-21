@@ -71,7 +71,7 @@ test('Correctly tell if all ship are sunk', () => {
 test('Give attackable positions', () => {
   const board = createGameBoard();
   board.receiveAttack([0, 0]);
-  expect(board.getAttackablePositions().length).toBe(99);
+  expect(board.getAttackPositions().length).toBe(99);
 });
 
 test('Give correct cell state', () => {
