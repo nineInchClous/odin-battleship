@@ -1,5 +1,5 @@
 /**
- * Create a ship with a given length and a position
+ * Create a ship with a given length
  */
 export default function createShip(pLength) {
   const length = pLength;
