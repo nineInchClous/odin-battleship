@@ -1,108 +1,140 @@
 import createShip from './ship';
 
 /**
+ *
+ * @returns
+ */
+function createGameBoardCell() {
+  const alreadyAttacked = false;
+  const ship = null;
+
+  return { alreadyAttacked, ship };
+}
+
+/**
  * Create a game board of size 10x10
  */
 export default function createGameBoard() {
   const size = 10;
-  const boardShip = Array(size)
-    .fill()
-    .map(() => Array(size));
-  const boardAttacks = Array(size)
-    .fill()
-    .map(() => Array(size));
+  const board = [];
+  for (let i = 0; i < size; i += 1) {
+    const row = [];
+    for (let j = 0; j < size; j += 1) {
+      row.push(createGameBoardCell());
+    }
+    board.push(row);
+  }
   const ships = [];
 
-  const placeShip = (pLength, pPosition, pHorizontal = true) => {
+  const isPositionValid = (pPosition) => {
     if (
       pPosition[0] < 0 ||
       pPosition[0] >= size ||
       pPosition[1] < 0 ||
       pPosition[1] >= size
     ) {
-      throw new RangeError(
-        `The starting position of the ship is outside the board. It must be within 0 and ${size}.`
-      );
+      return false;
     }
 
+    return true;
+  };
+
+  const isShipPlacable = (pLength, pPosition, pHorizontal = true) => {
+    if (!isPositionValid(pPosition)) return false;
+
     if (pHorizontal) {
-      if (pPosition[0] + pLength >= size) {
-        throw new RangeError(
-          `The end position of the ship is outside the board. It must be within 0 and ${size}. Change the starting position or the length of the ship`
-        );
-      } else {
-        for (let i = 0; i < pLength; i += 1) {
-          if (boardShip[pPosition[0] + i][pPosition[1]]) {
-            throw new Error(
-              `One ship is already at position [${pPosition[0] + i}, ${
-                pPosition[1]
-              }].`
-            );
-          }
-        }
-        const newShip = createShip(pLength);
-        ships.push(newShip);
-        for (let i = 0; i < pLength; i += 1) {
-          boardShip[pPosition[0] + i][pPosition[1]] = newShip;
+      if (pPosition[0] + pLength - 1 >= size) return false;
+
+      for (let i = 0; i < pLength; i += 1) {
+        if (board[pPosition[0] + i][pPosition[1]].ship !== null) {
+          return false;
         }
       }
-    } else if (pPosition[1] + pLength >= size) {
-      throw new RangeError(
-        `The end position of the ship is outside the board. It must be within 0 and ${size}. Change the starting position or the length of the ship`
-      );
     } else {
+      if (pPosition[1] + pLength >= size) return false;
+
       for (let i = 0; i < pLength; i += 1) {
-        if (boardShip[pPosition[0]][pPosition[1] + i]) {
-          throw new Error(
-            `One ship is already at position [${pPosition[0]}, ${
-              pPosition[1] + i
-            }].`
-          );
+        if (board[pPosition[0]][pPosition[1] + i].ship !== null) {
+          return false;
         }
-      }
-      const newShip = createShip(pLength);
-      ships.push(newShip);
-      for (let i = 0; i < pLength; i += 1) {
-        boardShip[pPosition[0]][pPosition[1] + i] = newShip;
       }
     }
+
+    return true;
+  };
+
+  const placeShip = (pLength, pPosition, pHorizontal = true) => {
+    if (!isShipPlacable(pLength, pPosition, pHorizontal)) return false;
+
+    const newShip = createShip(pLength);
+    ships.push(newShip);
+    if (pHorizontal) {
+      for (let i = 0; i < pLength; i += 1) {
+        board[pPosition[0] + i][pPosition[1]].ship = newShip;
+      }
+    } else {
+      for (let i = 0; i < pLength; i += 1) {
+        board[pPosition[0]][pPosition[1] + i].ship = newShip;
+      }
+    }
+
+    return true;
+  };
+
+  const isAttackPossible = (pPosition) => {
+    if (!isPositionValid(pPosition)) return false;
+
+    console.log(pPosition);
+    console.log(board[pPosition[0]][pPosition[1]].alreadyAttacked);
+
+    if (board[pPosition[0]][pPosition[1]].alreadyAttacked) return false;
+
+    return true;
   };
 
   const receiveAttack = (pPosition) => {
-    if (
-      pPosition[0] < 0 ||
-      pPosition[0] >= size ||
-      pPosition[1] < 0 ||
-      pPosition[1] >= size
-    ) {
-      throw new RangeError(
-        `The starting position of the ship is outside the board. It must be within 0 and ${size}.`
-      );
+    if (!isAttackPossible(pPosition)) return false;
+
+    if (board[pPosition[0]][pPosition[1]].ship !== null) {
+      board[pPosition[0]][pPosition[1]].ship.hit();
     }
 
-    if (
-      boardShip[pPosition[0]][pPosition[1]] &&
-      !boardAttacks[pPosition[0]][pPosition[1]]
-    ) {
-      boardShip[pPosition[0]][pPosition[1]].hit();
-      boardAttacks[pPosition[0]][pPosition[1]] = 'touched';
-      return true;
-    }
+    board[pPosition[0]][pPosition[1]].alreadyAttacked = true;
 
-    boardAttacks[pPosition[0]][pPosition[1]] = 'missed';
-    return false;
+    return true;
   };
 
   const isAllShipsSunk = () => {
-    let allSunk = true;
-    ships.forEach((ship) => {
-      if (!ship.isSunk()) {
-        allSunk = false;
-      }
-    });
-
-    return allSunk;
+    const notSunkShip = ships.find((ship) => !ship.isSunk());
+    return typeof notSunkShip === 'undefined';
   };
 
-  return { placeShip, receiveAttack, isAllShipsSunk };
+  /**
+   * Get attackable positions
+   * @returns Attackable positions
+   */
+  const getAttackablePositions = () => {
+    const attackablePositions = [];
+    for (let i = 0; i < board.length; i += 1) {
+      for (let j = 0; j < board[i].length; j += 1) {
+        if (!board[i][j].alreadyAttacked) {
+          attackablePositions.push([i, j]);
+        }
+      }
+    }
+    return attackablePositions;
+  };
+
+  const getCellState = (pPosition) => {
+    if (!isPositionValid(pPosition)) return false;
+    return board[pPosition[0]][pPosition[1]].alreadyAttacked;
+  };
+
+  return {
+    placeShip,
+    receiveAttack,
+    isAllShipsSunk,
+    getAttackablePositions,
+    getCellState,
+  };
 }
