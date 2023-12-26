@@ -1,7 +1,13 @@
 // #region Imports
 import './css/styles.scss';
-import createGameBoard from './js/gameBoard';
+import { createGrid, updateGrid } from './js/DOMHandler';
+import { game } from './js/game';
 
 // #endregion
 
-document.addEventListener('DOMContentLoaded', () => {});
+const playerGridContainer = document.getElementById('player-grid');
+const aiGridContainer = document.getElementById('ai-grid');
+
+createGrid(playerGridContainer);
+createGrid(aiGridContainer);
+updateGrid('ai-grid', game.ai.board);

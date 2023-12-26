@@ -1,4 +1,4 @@
-import createGameBoard from '../gameBoard';
+import { createGameBoard, createGameBoardCell } from '../gameBoard';
 
 test('Correctly place a ship horizontally', () => {
   const board = createGameBoard();
@@ -76,7 +76,8 @@ test('Give attackable positions', () => {
 
 test('Give correct cell state', () => {
   const board = createGameBoard();
-  expect(board.getCellState([0, 0])).toBe(false);
+  expect(board.getCellState([0, 0]).alreadyAttacked).toBe(false);
+  expect(board.getCellState([0, 0]).ship).toBe(null);
   board.receiveAttack([0, 0]);
-  expect(board.getCellState([0, 0])).toBe(true);
+  expect(board.getCellState([0, 0]).alreadyAttacked).toBe(true);
 });

@@ -1,4 +1,4 @@
-import createGameBoard from './gameBoard';
+import { createGameBoard } from './gameBoard';
 
 export const game = (() => {
   const player = (() => {

@@ -4,7 +4,7 @@ import createShip from './ship';
  * Create a cell for the game board with an alreadyAttacked and ship property
  * @returns A cell object for the game board
  */
-function createGameBoardCell() {
+export function createGameBoardCell() {
   const alreadyAttacked = false;
   const ship = null;
 
@@ -15,7 +15,7 @@ function createGameBoardCell() {
  * Create a game board of size 10x10
  * @returns A game board object
  */
-export default function createGameBoard() {
+export function createGameBoard() {
   const size = 10;
   const board = [];
   for (let i = 0; i < size; i += 1) {
@@ -109,9 +109,6 @@ export default function createGameBoard() {
   const isAttackPossible = (pPosition) => {
     if (!isPositionValid(pPosition)) return false;
 
-    console.log(pPosition);
-    console.log(board[pPosition[0]][pPosition[1]].alreadyAttacked);
-
     if (board[pPosition[0]][pPosition[1]].alreadyAttacked) return false;
 
     return true;
@@ -162,14 +159,14 @@ export default function createGameBoard() {
   /**
    * Know if this position has already been attacked
    * @param {Array} pPosition The position to validate (format: [x, y])
-   * @returns True if the position has already been attacked, otherwise false
+   * @returns {object} A cell object
    * @throws {RangeError} Throws an error is the position is outside the game board
    */
   const getCellState = (pPosition) => {
     if (!isPositionValid(pPosition)) {
       throw new RangeError('This position is outside the game board');
     }
-    return board[pPosition[0]][pPosition[1]].alreadyAttacked;
+    return board[pPosition[0]][pPosition[1]];
   };
 
   const placeShipsRandomly = () => {
