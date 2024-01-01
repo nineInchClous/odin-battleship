@@ -26,6 +26,8 @@ export function createGameBoard() {
     board.push(row);
   }
   const ships = [];
+  const shipsLength = [5, 4, 3, 3, 2];
+  let currShipIndex = 0;
 
   /**
    * Returns true if the position is valid (inside the game board), otherwise false
@@ -64,7 +66,7 @@ export function createGameBoard() {
         }
       }
     } else {
-      if (pPosition[1] + pLength >= size) return false;
+      if (pPosition[1] + pLength - 1 >= size) return false;
 
       for (let i = 0; i < pLength; i += 1) {
         if (board[pPosition[0]][pPosition[1] + i].ship !== null) {
@@ -98,13 +100,14 @@ export function createGameBoard() {
       }
     }
 
+    currShipIndex += 1;
     return true;
   };
 
   /**
    * Returns true if the attack is possible (inside the game board and that position has not already been attacked), otherwise false
    * @param {Array} pPosition The position to validate (format: [x, y])
-   * @returns True if the attack is possible, otherwise false
+   * @returns {boolean} True if the attack is possible, otherwise false
    */
   const isAttackPossible = (pPosition) => {
     if (!isPositionValid(pPosition)) return false;
@@ -117,7 +120,7 @@ export function createGameBoard() {
   /**
    * Attack a ship on the game board
    * @param {Array} pPosition The position to validate (format: [x, y])
-   * @returns True if the attack position is valid, otherwise false
+   * @returns {boolean} True if the attack position is valid, otherwise false
    */
   const receiveAttack = (pPosition) => {
     if (!isAttackPossible(pPosition)) return false;
@@ -133,7 +136,7 @@ export function createGameBoard() {
 
   /**
    * Returns true if all ship of the game board are sunk, otherwise false
-   * @returns True if all ship of the game board are sunk, otherwise false
+   * @returns {boolean} True if all ship of the game board are sunk, otherwise false
    */
   const isAllShipsSunk = () => {
     const notSunkShip = ships.find((ship) => !ship.isSunk());
@@ -142,7 +145,7 @@ export function createGameBoard() {
 
   /**
    * Get all the possible attack positions
-   * @returns An array of possible attack positions
+   * @returns {Array} An array of possible attack positions
    */
   const getAttackPositions = () => {
     const attackPositions = [];
@@ -169,8 +172,10 @@ export function createGameBoard() {
     return board[pPosition[0]][pPosition[1]];
   };
 
+  /**
+   * Place all ships randomly on the board
+   */
   const placeShipsRandomly = () => {
-    const shipsLength = [5, 4, 3, 3, 2];
     let horizontal;
     let x;
     let y;
@@ -190,6 +195,23 @@ export function createGameBoard() {
     });
   };
 
+  /**
+   * Get the length of the next ship to place
+   * @returns {number} The length of the next ship to place or null if all ship are already placed
+   */
+  const getNextShipLength = () => {
+    if (ships.length < shipsLength.length) {
+      return shipsLength[currShipIndex];
+    }
+    return null;
+  };
+
+  /**
+   * Returns true if all ships are placed on the board
+   * @returns {boolean} True if all ships are placed on the board, otherwise false
+   */
+  const isAllShipsPlaced = () => ships.length === 5;
+
   return {
     placeShip,
     receiveAttack,
@@ -197,5 +219,8 @@ export function createGameBoard() {
     getAttackPositions,
     getCellState,
     placeShipsRandomly,
+    previewNextShipPlacement: getNextShipLength,
+    isShipPlacable,
+    isAllShipsPlaced,
   };
 }

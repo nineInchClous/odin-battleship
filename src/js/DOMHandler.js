@@ -1,17 +1,16 @@
 import { game } from './game';
 
-const content = document.getElementById('content');
-const playerGridContainer = document.getElementById('player-grid');
-const aiGridContainer = document.getElementById('ai-grid');
 const gridSize = 10;
 const dialog = document.querySelector('dialog');
 const resultPara = document.getElementById('game-result');
 const restartGameBtn = document.querySelector('dialog button');
+const horizontalChckBx = document.getElementById('horizontal');
 
 /**
- *
- * @param {*} pGrid
- * @param {*} pPosition
+ * Get a grid cell
+ * @param {string} pGrid Id name of the grid ('player-grid' or 'ai-grid')
+ * @param {Array} pPosition The position of the cell (format: [x, y])
+ * @returns {HTMLElement} A grid cell (div element)
  */
 function getGridCell(pGrid, pPosition) {
   const rows = document.querySelectorAll(`#${pGrid} .row`);
@@ -20,10 +19,10 @@ function getGridCell(pGrid, pPosition) {
 }
 
 /**
- *
- * @param {*} pGrid
- * @param {*} pPosition
- * @param {*} pBoard
+ * Update the classes of a cell for styling purpose
+ * @param {string} pGrid Id name of the grid ('player-grid' or 'ai-grid')
+ * @param {Array} pPosition The position of the cell (format: [x, y])
+ * @param {object} pBoard The board to update (player or ai)
  */
 export function updateCell(pGrid, pPosition, pBoard) {
   const currCellState = pBoard.getCellState([pPosition[0], pPosition[1]]);
@@ -43,8 +42,8 @@ export function updateCell(pGrid, pPosition, pBoard) {
 }
 
 /**
- *
- * @param {*} board
+ * Update the classes of all cells of a grid for styling purpose
+ * @param {object} board The board to update (player or ai)
  */
 export function updateGrid(pGrid, pBoard) {
   for (let i = 0; i < gridSize; i += 1) {
@@ -55,28 +54,77 @@ export function updateGrid(pGrid, pBoard) {
 }
 
 /**
- *
+ * Attack as a player and update the ui
+ * @param {Array} pPosition The position of the cell (format: [x, y])
  */
-function handleClickAiGrid(pPosition) {
-  game.playAttack(pPosition);
-  updateCell('ai-grid', pPosition, game.ai.board);
-  updateGrid('player-grid', game.player.board);
+function attackAsPlayer(pPosition) {
+  if (game.isAllShipsPlaced()) {
+    game.playAttack(pPosition);
+    updateCell('ai-grid', pPosition, game.ai.board);
+    updateGrid('player-grid', game.player.board);
 
-  if (game.isGameOver()) {
-    resultPara.textContent = `${game.getWinner().toUpperCase()} wins the game!`;
-    dialog.showModal();
+    if (game.isGameOver()) {
+      resultPara.textContent = `${game
+        .getWinner()
+        .toUpperCase()} wins the game!`;
+      dialog.showModal();
+    }
   }
 }
 
 /**
- *
+ * Place a ship on the player board
+ * @param {Array} pPosition The position of the cell (format: [x, y])
  */
-function handleClickPlayerGrid() {
-  console.log(game.isGameOver());
+function placeShip(pPosition) {
+  const shipLength = game.player.board.previewNextShipPlacement();
+  if (shipLength !== null) {
+    game.player.board.placeShip(
+      shipLength,
+      pPosition,
+      horizontalChckBx.checked
+    );
+  }
 }
 
 /**
- *
+ * Preview the placement of a ship on the player board
+ * @param {*} pPosition The position of the cell (format: [x, y])
+ */
+function previewShipPlacement(pPosition) {
+  const shipLength = game.player.board.previewNextShipPlacement();
+  if (
+    shipLength !== null &&
+    game.player.board.isShipPlacable(
+      shipLength,
+      pPosition,
+      horizontalChckBx.checked
+    )
+  ) {
+    updateGrid('player-grid', game.player.board);
+    if (horizontalChckBx.checked) {
+      for (let i = 0; i < shipLength; i += 1) {
+        const currGridCell = getGridCell('player-grid', [
+          pPosition[0] + i,
+          pPosition[1],
+        ]);
+        currGridCell.classList.add('ship');
+      }
+    } else {
+      for (let i = 0; i < shipLength; i += 1) {
+        const currGridCell = getGridCell('player-grid', [
+          pPosition[0],
+          pPosition[1] + i,
+        ]);
+        currGridCell.classList.add('ship');
+      }
+    }
+  }
+}
+
+/**
+ * Create an empty grid
+ * @param {HTMLElement} pContainer The container of the grid
  */
 export function createGrid(pContainer) {
   let currCell;
@@ -92,9 +140,12 @@ export function createGrid(pContainer) {
       currCell.setAttribute('data-pos', [i, j]);
 
       if (pContainer.id === 'ai-grid') {
-        currCell.addEventListener('click', () => handleClickAiGrid([j, i]));
+        currCell.addEventListener('click', () => attackAsPlayer([j, i]));
       } else {
-        currCell.addEventListener('click', handleClickPlayerGrid);
+        currCell.addEventListener('click', () => placeShip([j, i]));
+        currCell.addEventListener('mouseover', () =>
+          previewShipPlacement([j, i])
+        );
       }
 
       currRow.appendChild(currCell);

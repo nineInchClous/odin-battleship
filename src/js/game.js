@@ -1,5 +1,8 @@
 import { createGameBoard } from './gameBoard';
 
+/**
+ * Game object with player and ai board
+ */
 export const game = (() => {
   const player = (() => {
     const board = createGameBoard();
@@ -23,15 +26,17 @@ export const game = (() => {
     return { board, playRandomAttack };
   })();
 
+  /**
+   * Returns true if all ships of one player are sunk
+   * @returns {boolean} True if all ships of one player are sunk, otherwise false
+   */
   const isGameOver = () =>
     player.board.isAllShipsSunk() || ai.board.isAllShipsSunk();
 
-  const playAttack = (pPosition) => {
-    if (ai.board.receiveAttack(pPosition) && !isGameOver()) {
-      ai.playRandomAttack(player.board);
-    }
-  };
-
+  /**
+   * Returns the name of the winner ('player' or 'ai')
+   * @returns {string} The name of the winner
+   */
   const getWinner = () => {
     if (player.board.isAllShipsSunk()) {
       return 'ai';
@@ -40,6 +45,19 @@ export const game = (() => {
     return 'player';
   };
 
+  /**
+   * Attack as the player, then make the ai attack the player
+   * @param {Array} pPosition The position to attack as the player (format: [x, y])
+   */
+  const playAttack = (pPosition) => {
+    if (ai.board.receiveAttack(pPosition) && !isGameOver()) {
+      ai.playRandomAttack(player.board);
+    }
+  };
+
+  /**
+   * Reset player's and ai's board
+   */
   const resetGame = () => {
     player.board = createGameBoard();
 
@@ -47,5 +65,20 @@ export const game = (() => {
     ai.board.placeShipsRandomly();
   };
 
-  return { player, ai, playAttack, resetGame, isGameOver, getWinner };
+  /**
+   * Returns true if all ship from the player and the ai are placed
+   * @returns {boolean} True if all ship from the player and the ai are placed, otherwise false
+   */
+  const isAllShipsPlaced = () =>
+    player.board.isAllShipsPlaced() && ai.board.isAllShipsPlaced();
+
+  return {
+    player,
+    ai,
+    playAttack,
+    resetGame,
+    isGameOver,
+    getWinner,
+    isAllShipsPlaced,
+  };
 })();

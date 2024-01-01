@@ -81,3 +81,14 @@ test('Give correct cell state', () => {
   board.receiveAttack([0, 0]);
   expect(board.getCellState([0, 0]).alreadyAttacked).toBe(true);
 });
+
+test('Correctly tell if all ships are placed', () => {
+  const board = createGameBoard();
+  expect(board.isAllShipsPlaced()).toBe(false);
+  board.placeShip(1, [0, 0]);
+  board.placeShip(1, [1, 0]);
+  board.placeShip(1, [2, 0]);
+  board.placeShip(1, [3, 0]);
+  board.placeShip(1, [4, 0]);
+  expect(board.isAllShipsPlaced()).toBe(true);
+});
