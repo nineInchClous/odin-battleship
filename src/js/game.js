@@ -22,15 +22,13 @@ export const game = (() => {
 
     return { board, playRandomAttack };
   })();
-  let playerTurn = true;
+
+  const isGameOver = () =>
+    player.board.isAllShipsSunk() || ai.board.isAllShipsSunk();
 
   const playAttack = (pPosition) => {
-    if (playerTurn && ai.board.receiveAttack(pPosition)) {
-      playerTurn = false;
-      document.setTimeout(() => {
-        ai.playRandomAttack(player.board);
-        playerTurn = true;
-      }, 1000);
+    if (ai.board.receiveAttack(pPosition) && !isGameOver()) {
+      ai.playRandomAttack(player.board);
     }
   };
 
@@ -41,9 +39,6 @@ export const game = (() => {
 
     return 'player';
   };
-
-  const isGameOver = () =>
-    player.board.isAllShipsSunk() || ai.board.isAllShipsSunk();
 
   const resetGame = () => {
     player.board = createGameBoard();
