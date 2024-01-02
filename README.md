@@ -5,7 +5,7 @@
 <a href="https://www.theodinproject.com/lessons/node-path-javascript-battleship">The Odin Project assignement</a>
 
 ## What I learned
-- Use of **Test Drive Development** in JavaScript with **Jest**
+- Use of **Test Driven Development** in JavaScript with **Jest**
 - Use of **Factory Functions** and **Module Pattern**
 
 ## Made with
