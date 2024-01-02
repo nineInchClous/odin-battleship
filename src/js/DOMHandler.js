@@ -5,7 +5,8 @@ const dialog = document.querySelector('dialog');
 const resultPara = document.getElementById('game-result');
 const restartGameBtn = document.querySelector('dialog button');
 const horizontalChckBx = document.getElementById('horizontal');
-const instructionsSect = document.getElementById('instructions');
+const horizontalLabel = document.querySelector('#instructions label');
+const instructionsPara = document.querySelector('#instructions h2');
 
 /**
  * Get a grid cell
@@ -110,7 +111,9 @@ function placeShip(pPosition) {
     }
 
     if (game.isAllShipsPlaced()) {
-      instructionsSect.classList.add('hide');
+      instructionsPara.textContent = 'Good luck captain';
+      horizontalChckBx.classList.add('hide');
+      horizontalLabel.classList.add('hide');
     }
   }
 }
@@ -199,5 +202,7 @@ restartGameBtn.addEventListener('click', () => {
   game.resetGame();
   updateGrid('player-grid', game.player.board);
   updateGrid('ai-grid', game.ai.board);
-  instructionsSect.classList.remove('hide');
+  horizontalChckBx.classList.remove('hide');
+  horizontalLabel.classList.remove('hide');
+  instructionsPara.textContent = 'Place your ships';
 });
