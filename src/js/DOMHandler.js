@@ -5,6 +5,7 @@ const dialog = document.querySelector('dialog');
 const resultPara = document.getElementById('game-result');
 const restartGameBtn = document.querySelector('dialog button');
 const horizontalChckBx = document.getElementById('horizontal');
+const instructionsSect = document.getElementById('instructions');
 
 /**
  * Get a grid cell
@@ -79,11 +80,38 @@ function attackAsPlayer(pPosition) {
 function placeShip(pPosition) {
   const shipLength = game.player.board.previewNextShipPlacement();
   if (shipLength !== null) {
-    game.player.board.placeShip(
-      shipLength,
-      pPosition,
-      horizontalChckBx.checked
-    );
+    let startPos = pPosition;
+    if (
+      !game.player.board.isPositionAndLengthValid(
+        shipLength,
+        pPosition,
+        horizontalChckBx.checked
+      )
+    ) {
+      if (horizontalChckBx.checked) {
+        startPos = [game.player.board.size - shipLength, pPosition[1]];
+      } else {
+        startPos = [pPosition[0], game.player.board.size - shipLength];
+      }
+    }
+
+    if (
+      !game.player.board.isPositionOccupied(
+        shipLength,
+        startPos,
+        horizontalChckBx.checked
+      )
+    ) {
+      game.player.board.placeShip(
+        shipLength,
+        startPos,
+        horizontalChckBx.checked
+      );
+    }
+
+    if (game.isAllShipsPlaced()) {
+      instructionsSect.classList.add('hide');
+    }
   }
 }
 
@@ -93,28 +121,39 @@ function placeShip(pPosition) {
  */
 function previewShipPlacement(pPosition) {
   const shipLength = game.player.board.previewNextShipPlacement();
-  if (
-    shipLength !== null &&
-    game.player.board.isShipPlacable(
-      shipLength,
-      pPosition,
-      horizontalChckBx.checked
-    )
-  ) {
+  if (shipLength !== null) {
     updateGrid('player-grid', game.player.board);
     if (horizontalChckBx.checked) {
+      let xStart;
+      if (!game.player.board.isPositionAndLengthValid(shipLength, pPosition)) {
+        xStart = game.player.board.size - shipLength;
+      } else {
+        [xStart] = pPosition;
+      }
       for (let i = 0; i < shipLength; i += 1) {
         const currGridCell = getGridCell('player-grid', [
-          pPosition[0] + i,
+          xStart + i,
           pPosition[1],
         ]);
         currGridCell.classList.add('ship');
       }
     } else {
+      let yStart;
+      if (
+        !game.player.board.isPositionAndLengthValid(
+          shipLength,
+          pPosition,
+          false
+        )
+      ) {
+        yStart = game.player.board.size - shipLength;
+      } else {
+        [, yStart] = pPosition;
+      }
       for (let i = 0; i < shipLength; i += 1) {
         const currGridCell = getGridCell('player-grid', [
           pPosition[0],
-          pPosition[1] + i,
+          yStart + i,
         ]);
         currGridCell.classList.add('ship');
       }
@@ -130,7 +169,7 @@ export function createGrid(pContainer) {
   let currCell;
   let currRow;
 
-  for (let i = 0; i < gridSize; i += 1) {
+  for (let i = gridSize - 1; i >= 0; i -= 1) {
     currRow = document.createElement('div');
     currRow.className = 'row';
 
@@ -151,7 +190,7 @@ export function createGrid(pContainer) {
       currRow.appendChild(currCell);
     }
 
-    pContainer.appendChild(currRow);
+    pContainer.prepend(currRow);
   }
 }
 
@@ -160,4 +199,5 @@ restartGameBtn.addEventListener('click', () => {
   game.resetGame();
   updateGrid('player-grid', game.player.board);
   updateGrid('ai-grid', game.ai.board);
+  instructionsSect.classList.remove('hide');
 });

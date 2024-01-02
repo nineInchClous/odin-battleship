@@ -48,6 +48,46 @@ export function createGameBoard() {
   };
 
   /**
+   * Returns true if the position and length of the ship are within the board, otherwise false
+   * @param {number} pLength The length of the ship to place
+   * @param {Array} pPosition The position to validate (format: [x, y])
+   * @param {boolean} pHorizontal True if the ship is positioned horizontally, false if its positioned vertically
+   * @returns True if the position and length of the ship are within the board, otherwise false
+   */
+  const isPositionAndLengthValid = (pLength, pPosition, pHorizontal = true) => {
+    if (pHorizontal) {
+      if (pPosition[0] + pLength - 1 >= size) return false;
+    } else if (pPosition[1] + pLength - 1 >= size) return false;
+
+    return true;
+  };
+
+  /**
+   * Returns true if the position of the ship is already occupied by another ship, otherwise false
+   * @param {number} pLength The length of the ship to place
+   * @param {Array} pPosition The position to validate (format: [x, y])
+   * @param {boolean} pHorizontal True if the ship is positioned horizontally, false if its positioned vertically
+   * @returns True if the position of the ship is already occupied by another ship, otherwise false
+   */
+  const isPositionOccupied = (pLength, pPosition, pHorizontal = true) => {
+    if (pHorizontal) {
+      for (let i = 0; i < pLength; i += 1) {
+        if (board[pPosition[0] + i][pPosition[1]].ship !== null) {
+          return true;
+        }
+      }
+    } else {
+      for (let i = 0; i < pLength; i += 1) {
+        if (board[pPosition[0]][pPosition[1] + i].ship !== null) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  /**
    * Returns true if the ship is placable (inside the game board), otherwise false
    * @param {number} pLength The length of the ship to place
    * @param {Array} pPosition The position to validate (format: [x, y])
@@ -56,26 +96,9 @@ export function createGameBoard() {
    */
   const isShipPlacable = (pLength, pPosition, pHorizontal = true) => {
     if (!isPositionValid(pPosition)) return false;
-
-    if (pHorizontal) {
-      if (pPosition[0] + pLength - 1 >= size) return false;
-
-      for (let i = 0; i < pLength; i += 1) {
-        if (board[pPosition[0] + i][pPosition[1]].ship !== null) {
-          return false;
-        }
-      }
-    } else {
-      if (pPosition[1] + pLength - 1 >= size) return false;
-
-      for (let i = 0; i < pLength; i += 1) {
-        if (board[pPosition[0]][pPosition[1] + i].ship !== null) {
-          return false;
-        }
-      }
-    }
-
-    return true;
+    if (!isPositionAndLengthValid(pLength, pPosition, pHorizontal))
+      return false;
+    return !isPositionOccupied(pLength, pPosition, pHorizontal);
   };
 
   /**
@@ -222,5 +245,8 @@ export function createGameBoard() {
     previewNextShipPlacement: getNextShipLength,
     isShipPlacable,
     isAllShipsPlaced,
+    isPositionOccupied,
+    isPositionAndLengthValid,
+    size,
   };
 }
