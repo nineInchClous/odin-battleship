@@ -147,6 +147,12 @@ footer {
 }
 
 dialog {
+  &[open] {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  opacity: 0;
+  transform: scaleY(0);
   background-color: $dark;
   border: none;
   border-radius: 10px;
@@ -156,6 +162,9 @@ dialog {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition:
+    opacity 300ms ease-in-out,
+    transform 300ms ease-in-out;
 
   p {
     margin-bottom: 40px;

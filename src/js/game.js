@@ -18,7 +18,7 @@ export const game = (() => {
      * @param {*} pEnemyBoard The board to attack
      */
     const playRandomAttack = (pEnemyBoard) => {
-      const possibleAttacks = board.getAttackPositions();
+      const possibleAttacks = player.board.getAttackPositions();
       const rndIndex = Math.floor(Math.random() * possibleAttacks.length);
       pEnemyBoard.receiveAttack(possibleAttacks[rndIndex]);
     };
