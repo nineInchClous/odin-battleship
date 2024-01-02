@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Odin Project - Battleship</title>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+    <script
+      src="https://kit.fontawesome.com/9fc52b5779.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="main.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Another Battleship</h1>
+    </header>
+
+    <main>
+      <section id="instructions">
+        <h2>Place your ships</h2>
+        <label for="horizontal">Horizontal</label>
+        <input type="checkbox" name="horizontal" id="horizontal" />
+      </section>
+
+      <div id="grids-container">
+        <div id="player-grid">
+          <p>Player's grid</p>
+        </div>
+        <div id="ai-grid">
+          <p>Opponent's grid</p>
+        </div>
+      </div>
+    </main>
+
+    <dialog>
+      <p id="game-result"></p>
+      <button type="button" autofocus>Restart</button>
+    </dialog>
+
+    <footer>
+      <p>Copyright &copy; Thibault Castelli</p>
+      <a href="https://github.com/nineInchClous" target="_blank"
+        ><i class="fa-brands fa-github"></i
+      ></a>
+    </footer>
+  </body>
+</html>
